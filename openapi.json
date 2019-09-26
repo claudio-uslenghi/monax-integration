@@ -1,0 +1,124 @@
+{
+  "openapi" : "3.0.0",
+  "info" : {
+    "title" : "Simple Payment API",
+    "description" : "This is a simple Payment API",
+    "contact" : {
+      "email" : "you@your-company.com"
+    },
+    "license" : {
+      "name" : "Apache 2.0",
+      "url" : "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version" : "1.0.0"
+  },
+  "servers" : [ {
+    "url" : "https://virtserver.swaggerhub.com/claudio.zircon.tech/monax-integration/1.0.0",
+    "description" : "SwaggerHub API Auto Mocking"
+  } ],
+  "tags" : [ {
+    "name" : "admins",
+    "description" : "Secured Admin-only calls"
+  }, {
+    "name" : "developers",
+    "description" : "Operations available to regular developers"
+  } ],
+  "paths" : {
+    "/pay" : {
+      "get" : {
+        "tags" : [ "developers" ],
+        "summary" : "search for payment status",
+        "description" : "By passing in the appropriate options, you can search for\npaymente executed or not in the system\n",
+        "operationId" : "searchPayment",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "query",
+          "description" : "pass an optional search string for looking up payment",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "search results matching criteria",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Payment"
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "bad input parameter"
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "admins" ],
+        "summary" : "excecute a payment",
+        "description" : "Execute a payment in the system",
+        "operationId" : "executePayment",
+        "requestBody" : {
+          "description" : "Payment to execute",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Payment"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "description" : "payment send to execute"
+          },
+          "400" : {
+            "description" : "invalid input, object invalid"
+          },
+          "409" : {
+            "description" : "an existing payment already exists"
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "Payment" : {
+        "required" : [ "concepto", "id", "legajo", "monto" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "format" : "uuid",
+            "example" : "d290f1ee-6c54-4b01-90e6-d701748f0851"
+          },
+          "legajo" : {
+            "type" : "string",
+            "example" : "legajo"
+          },
+          "concepto" : {
+            "type" : "string",
+            "example" : "concepto"
+          },
+          "monto" : {
+            "type" : "string",
+            "example" : "3443"
+          },
+          "status" : {
+            "type" : "string",
+            "example" : "Failed",
+            "enum" : [ "Pending", "Failed", "Executed" ]
+          }
+        }
+      }
+    }
+  }
+}
