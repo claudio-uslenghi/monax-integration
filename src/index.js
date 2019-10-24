@@ -4,8 +4,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const app = express().use(bodyParser.json()); // creates http server
 const {TOKEN} = require('./config');
-//const {sendEmail} = require('./email/sendMail');
-const {sendTemplate, createPdf} = require('./email/sendMail');
+const {EMAIL_ACCOUNT, EMAIL_SECRET, EMAIL_FROM_ADDR} = require('./config');
+const {sendTemplate} = require('./email/sendMail');
 
 app.listen(3000, () => console.log('Webhook is listening'));
 
@@ -50,12 +50,10 @@ app.post('/resguardo', (req, res) => {
     console.log("Resguardo data: ",req.body);
 
 
-    //createPdf();
-
    sendTemplate(
         'resguardo',
         'Resguardo',
-        'zirconlegal@gmail.com',
+        EMAIL_FROM_ADDR,
         {
             first_name: 'Danieltest',
             last_name: 'Pereztest'
