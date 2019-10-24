@@ -1,0 +1,13 @@
+// forever/development.json
+{
+  // Comments are supported
+  "uid": "app",
+  "append": true,
+  "watch": true,
+  "spinSleepTime": 60000,
+  "script": "src/index.js",
+  "sourceDir": "/home/claudio/monax/monax-integration",
+  "logFile": "/home/claudio/monax/monax-integration/logs/forever.log",
+  "outFile": "/home/claudio/monax/monax-integration/logs/out.log",
+  "errFile": "/home/claudio/monax/monax-integration/logs/error.log"
+}

@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const bluebird = require('bluebird');
-const {PUBLIC_WEB_SITE} = require('../../config');
+const {PUBLIC_WEB_SITE} = require('../config');
 const ejs = require('ejs');
 
 async function compileTemplates() {
