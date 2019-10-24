@@ -4,7 +4,7 @@ const {loadTemplate} = require('./templateLoader');
 
 const fs = require('fs');
 const pdf = require('html-pdf');
-const html = fs.readFileSync(TEMPLATE_PATH + 'resguardo.html', 'utf8');
+//const html = fs.readFileSync(TEMPLATE_PATH + 'resguardo.html', 'utf8');
 const options = {format: 'Letter'};
 
 
@@ -24,11 +24,12 @@ module.exports = {
         ).then(
             (content) => {
 
+                /*
                 pdf.create(content, options).toFile(TEMPLATE_PATH +'resguardo.pdf',
                     function (err, res) {
                         if (err) return console.log(err);
                         console.log("se creo pdf"); //
-
+*/
                         return new Promise(
                             (resolve, reject) => {
                                 transporter.sendMail(
@@ -55,8 +56,11 @@ module.exports = {
                                 );
                             }
                         );
-                    });
-            }
+
+    /*
+            });
+      */
+    }
         );
     },
 };
