@@ -1,10 +1,10 @@
 const nodemailer = require('nodemailer');
-const {EMAIL_ACCOUNT, EMAIL_SECRET, EMAIL_FROM_ADDR} = require('../config');
+const {EMAIL_ACCOUNT, EMAIL_SECRET, EMAIL_FROM_ADDR, TEMPLATE_PATH} = require('../config');
 const {loadTemplate} = require('./templateLoader');
 
 const fs = require('fs');
 const pdf = require('html-pdf');
-const html = fs.readFileSync('/home/claudio/monax/monax-integration/src/email/templates/resguardo.html', 'utf8');
+const html = fs.readFileSync(TEMPLATE_PATH + 'resguardo.html', 'utf8');
 const options = {format: 'Letter'};
 
 
@@ -24,7 +24,7 @@ module.exports = {
         ).then(
             (content) => {
 
-                pdf.create(content, options).toFile('/home/claudio/monax/monax-integration/src/email/templates/resguardo.pdf',
+                pdf.create(content, options).toFile(TEMPLATE_PATH +'resguardo.pdf',
                     function (err, res) {
                         if (err) return console.log(err);
                         console.log("se creo pdf"); //
@@ -41,7 +41,7 @@ module.exports = {
                                         attachments: [
                                             {
                                                 filename: 'resguardo.pdf',
-                                                path: '/home/claudio/monax/monax-integration/src/email/templates/resguardo.pdf'
+                                                path: TEMPLATE_PATH + 'resguardo.pdf'
                                             },
                                         ]
                                     },
