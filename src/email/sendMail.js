@@ -41,8 +41,8 @@ module.exports = {
                                         html: content,
                                         attachments: [
                                             {
-                                                filename: 'resguardo.pdf',
-                                                path: TEMPLATE_PATH + 'resguardo.pdf'
+                                                filename: 'resguardoFile.pdf',
+                                                path: TEMPLATE_PATH + 'resguardoFile.pdf'
                                             },
                                         ]
                                     },
