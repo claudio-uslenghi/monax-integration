@@ -5,5 +5,5 @@ const app = express();
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./openapi.json');
 
-app.listen(3000, () => console.log('[ChatBot] Webhook is listening'));
+app.listen(3100, () => console.log('[ChatBot] Webhook is listening'));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));

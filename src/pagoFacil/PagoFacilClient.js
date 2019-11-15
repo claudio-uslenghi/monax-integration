@@ -1,27 +1,25 @@
 const rp = require('request-promise-native');
 const _ = require('lodash');
-const {TOKEN, MONAX_TOKEN, MONAX_BASE_URL, MONAX_USER, MONAX_PASS} = require('./../config');
-const logger = require('../logger');
+const {TOKEN, PAGO_FACIL_TOKEN, PAGO_FACIL_BASE_URL} = require('./../config');
 
-class MonaxClient {
+
+class PagoFacilClient {
     constructor(args) {
         this.options = {
             headers:
                 {
                     'cache-control': 'no-cache',
                     'content-type': 'application/json',
-                    'cookie': MONAX_TOKEN
+                    'authorization': `Bearer ${PAGO_FACIL_TOKEN}`
                 },
-            baseUrl: MONAX_BASE_URL,
+            baseUrl: PAGO_FACIL_BASE_URL,
             uri: '',
             timeout: 10000,
-            method: 'GET',
+            method: 'POST',
             gzip: true,
             resolveWithFullResponse: true
         };
-        this.getActivityInstances = this.getActivityInstances.bind(this);
-        this.login = this.login.bind(this);
-
+        this.loginToken = this.loginToken.bind(this);
     }
 
     async _send(uri, options, requestSchema) {
@@ -57,49 +55,15 @@ class MonaxClient {
         }
     }
 
-
-
-    async login() {
-        const uri = '/users/login/';
-        const options = 'PUT';
-
-        let requestSchema = {
-            "username": MONAX_USER,
-            "password": MONAX_PASS
-        };
-
+    async loginToken() {
+        const uri = 'loginToken';
+        const options = 'POST';
+        let requestSchema = {};
         let result = await this._send(uri, options, requestSchema);
+        console.log(`Pago Facil JWT token ${result}`)
         return result;
     }
 
-    async getActivityInstances(id) {
-        const uri = `/bpm/activity-instances/${id}/data-mappings/`;
-        let requestSchema = {}
-        const options = 'GET';
-        let result =  await this._send(uri, options, requestSchema);
-        logger.info(`getActivityInstances result= ${result}`);
-        return result;
-    }
-
-    async completeTask(id) {
-        const uri = `/tasks/${id}/complete/`;
-        let requestSchema = {}
-        const options = 'PUT';
-        let result =  await this._send(uri, options, requestSchema);
-        logger.info(`completeTask result= ${result}`);
-        return result;
-    }
-
-
-
-    async getAndCompleteTask(id) {
-        logger.info("1.0 getAndCompleteTask");
-        let res = await this.getActivityInstances(id);
-        logger.info("1.1 getAndCompleteTask");
-        let result = await this.completeTask(id);
-        logger.info("1.2 getAndCompleteTask");
-        return result;
-    }
 }
 
-module.exports = MonaxClient;
+module.exports = PagoFacilClient;

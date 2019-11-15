@@ -6,7 +6,7 @@ const MonaxClient = require('../monax/MonaxClient');
 const monaxClient = new MonaxClient({});
 
 const id = 'C3BBCA8CCFEC938788AC0ABBAB08E94EF736A4893B38F648C32ECB332B3B1C98';
-
+/*
 describe('Monax Client Test', async () => {
 
 
@@ -33,3 +33,4 @@ describe('Monax Client Test', async () => {
     })
 
 });
+*/
