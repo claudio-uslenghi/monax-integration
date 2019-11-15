@@ -26,9 +26,9 @@ let processMessageReceived = schedule.scheduleJob('*/60 * * * * *', async functi
 });
 
 let processMessageFinish = schedule.scheduleJob('*/120 * * * * *', async function () {
-    logger.info('========================START job run each 30 secondsPROCESS FINISH MSG==============================');
+    logger.info('========================START job run each 120 seconds PROCESS FINISH MSG===============================');
     let p = payment.processFinish();
-    logger.info('========================FINISH job run each 30 seconds=================================================');
+    logger.info('========================FINISH job run each 120 seconds=================================================');
 });
 
 
@@ -204,6 +204,9 @@ app.post('/pay/send', (req, res) => {
     res.json(data);
 });
 
+/************************************************************************************************
+ * MANAGE MESSAGES
+ ************************************************************************************************/
 
 /****************************************
  * GET Message by ID
@@ -277,9 +280,37 @@ app.post('/message', (req, res) => {
     res.json(data);
 });
 
+
 /****************************************
- * PAGO FACIL CALLBACK
+ * DELETE Message by ID
  ***************************************/
+app.delete('/message/:activity_instance_id', (req, res) => {
+    const token = req.query.token;
+    const id = req.params.activity_instance_id;
+    if (token !== TOKEN) {
+        logger.error(`Token Invalid ${req.query.token}`);
+        return res.sendStatus(401);
+    }
+
+    let response = {};
+    if (id) {
+        logger.info(`activity_instance_id = ${id}`)
+        response = storageClient.del(id);
+    }
+    const data = {
+        response: {
+            code: "OK",
+            message: response
+        }
+    };
+    res.json(data);
+});
+
+
+
+/************************************************************************************************
+ * PAGO FACIL CALLBACK
+ ************************************************************************************************/
 
 /****************************************
  * GET /pagofacil/callback
