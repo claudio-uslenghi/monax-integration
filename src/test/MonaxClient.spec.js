@@ -1,7 +1,7 @@
-const {assert, expect} = require('chai');
+const { assert, expect } = require('chai');
 const _ = require('lodash');
 const MonaxClient = require('../monax/MonaxClient');
-//const config              = require('../etc/config.json');
+// const config              = require('../etc/config.json');
 
 const monaxClient = new MonaxClient({});
 
