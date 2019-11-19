@@ -331,7 +331,7 @@ app.get('/pay/pagofacil/callback', (req, res) => {
     }
 
     if (req.body) {
-        logger.info(`/pay/pagofacil/callback body  = ${req.body}`)
+        logger.info(`/pay/pagofacil/callback body  = ${JSON.stringify(req.body)}`)
     }
     const data = {
         response: {
@@ -377,7 +377,7 @@ app.get('/pay/pagofacil/complete', (req, res) => {
     }
 
     if (req.body) {
-        logger.info(`/pay/pagofacil/complete body  = ${req.body}`)
+        logger.info(`/pay/pagofacil/complete body  = ${JSON.stringify(req.body)}`)
     }
     const data = {
         response: {
