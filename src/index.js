@@ -18,6 +18,9 @@ const monaxClient = new MonaxClient({});
 const storageClient = new StorageClient();
 const payment = new Payment();
 
+const CODE_NO_ERROR = "OK";
+const MSG_RECEIVED = "Message received successfully";
+
 
 let processMessageReceived = schedule.scheduleJob('*/60 * * * * *', async function () {
     logger.info('========================START job run each 60 seconds PROCESS RECEIVED MSG============================');
@@ -76,7 +79,7 @@ app.post('/pay', async (req, res) => {
 
     const data = {
         response: {
-            code: "OK",
+            code: CODE_NO_ERROR,
             message: "Pay msg processed successfully"
         }
     };
@@ -106,7 +109,7 @@ app.get('/pay', (req, res) => {
     }
     const data = {
         response: {
-            code: "OK",
+            code: CODE_NO_ERROR,
             message: response
         }
     };
@@ -140,7 +143,7 @@ app.put('/pay/task/complete', (req, res) => {
     }
     const data = {
         response: {
-            code: "OK",
+            code: CODE_NO_ERROR,
             message: result
         }
     };
@@ -175,7 +178,7 @@ app.post('/resguardo', (req, res) => {
 
     const data = {
         response: {
-            code: "OK",
+            code: CODE_NO_ERROR,
             message: "Resguardo msg processed successfully"
         }
     };
@@ -197,7 +200,7 @@ app.post('/pay/send', (req, res) => {
     const pay = storageClient.get(id);
     //logger.info("payment: ", pay);
     const msg = pay ? "Payment send to Pago Facil" : "Id not found, payment is not sent to Pago Faci";
-    const code = pay ? "OK" : "ERROR";
+    const code = pay ? CODE_NO_ERROR : "ERROR";
 
     const data = {
         response: {
@@ -230,7 +233,7 @@ app.get('/message/:activity_instance_id', (req, res) => {
     }
     const data = {
         response: {
-            code: "OK",
+            code: CODE_NO_ERROR,
             message: response
         }
     };
@@ -254,7 +257,7 @@ app.get('/message/status/:statusId', (req, res) => {
     }
     const data = {
         response: {
-            code: "OK",
+            code: CODE_NO_ERROR,
             message: response
         }
     };
@@ -277,7 +280,7 @@ app.post('/message', (req, res) => {
     }
     const data = {
         response: {
-            code: "OK",
+            code: CODE_NO_ERROR,
             message: response
         }
     };
@@ -303,7 +306,7 @@ app.delete('/message/:activity_instance_id', (req, res) => {
     }
     const data = {
         response: {
-            code: "OK",
+            code: CODE_NO_ERROR,
             message: response
         }
     };
@@ -317,79 +320,94 @@ app.delete('/message/:activity_instance_id', (req, res) => {
  ************************************************************************************************/
 
 /****************************************
- * GET /pagofacil/callback
+ * GET /pay/pagofacil/callback
  ***************************************/
-app.get('/pagofacil/callback', (req, res) => {
-    logger.info(`/pagofacil/callback received`)
+app.get('/pay/pagofacil/callback', (req, res) => {
+    logger.info(`/pay/pagofacil/callback received`)
     const token = req.query.token;
     if (token !== TOKEN) {
         logger.error(`Token Invalid ${req.query.token}`);
         return res.sendStatus(401);
     }
 
-    let response = {};
     if (req.body) {
-        logger.info(`/pagofacil/callback body  = ${req.body}`)
+        logger.info(`/pay/pagofacil/callback body  = ${req.body}`)
     }
     const data = {
         response: {
-            code: "OK",
-            message: response
+            code: CODE_NO_ERROR,
+            message: MSG_RECEIVED
         }
     };
     res.json(data);
 });
 
 /****************************************
- * GET /pagofacil/callback
+ * GET  /pay/pagofacil/cancel
  ***************************************/
-app.get('/pagofacil/cancel', (req, res) => {
-    logger.info(`/pagofacil/cancel received`)
+app.get('/pay/pagofacil/cancel', (req, res) => {
+    logger.info(`/pay/pagofacil/cancel received`)
     const token = req.query.token;
     if (token !== TOKEN) {
         logger.error(`Token Invalid ${req.query.token}`);
         return res.sendStatus(401);
     }
 
-    let response = {};
     if (req.body) {
-        logger.info(`/pagofacil/cancel body  = ${req.body}`)
+        logger.info(`/pay/pagofacil/cancel body  = ${JSON.stringify(req.body)}`)
     }
     const data = {
         response: {
-            code: "OK",
-            message: response
+            code: CODE_NO_ERROR,
+            message: MSG_RECEIVED
         }
     };
     res.json(data);
 });
 
 /****************************************
- * GET /pagofacil/complete
+ * GET  /pay/pagofacil/complete
  ***************************************/
-app.get('/pagofacil/complete', (req, res) => {
-    logger.info(`/pagofacil/complete received`)
+app.get('/pay/pagofacil/complete', (req, res) => {
+    logger.info(`/pay/pagofacil/complete received`)
     const token = req.query.token;
     if (token !== TOKEN) {
         logger.error(`Token Invalid ${req.query.token}`);
         return res.sendStatus(401);
     }
 
-    let response = {};
     if (req.body) {
-        logger.info(`/pagofacil/complete body  = ${req.body}`)
+        logger.info(`/pay/pagofacil/complete body  = ${req.body}`)
     }
     const data = {
         response: {
-            code: "OK",
-            message: response
+            code: CODE_NO_ERROR,
+            message: MSG_RECEIVED
         }
     };
     res.json(data);
 });
 
 
+/****************************************
+ * GET /pay/pagofacil/tef/callback
+ ***************************************/
+app.get('/pay/pagofacil/tef/callback', (req, res) => {
+    logger.info(`/pay/pagofacil/tef/callback received`)
+    const token = req.query.token;
+    if (token !== TOKEN) {
+        logger.error(`Token Invalid ${req.query.token}`);
+        return res.sendStatus(401);
+    }
 
-
-
-
+    if (req.body) {
+        logger.info(`/pay/pagofacil/tef/callback body  = ${JSON.stringify(req.body)}`)
+    }
+    const data = {
+        response: {
+            code: CODE_NO_ERROR,
+            message: MSG_RECEIVED
+        }
+    };
+    res.json(data);
+});
