@@ -1,17 +1,17 @@
 const rp = require('request-promise-native');
 const _ = require('lodash');
-const { TOKEN, PAGO_FACIL_TOKEN, PAGO_FACIL_BASE_URL } = require('./../config');
-
+const { PAGO_FACIL_TOKEN, PAGO_FACIL_BASE_URL, PAGO_FACIL_ACCOUNT_ID, PAGO_FACIL_USER } = require('./../config');
+const logger = require('../logger');
 
 class PagoFacilClient {
-  constructor(args) {
+  constructor() {
     this.options = {
       headers:
-                {
-                  'cache-control': 'no-cache',
-                  'content-type': 'application/json',
-                  authorization: `Bearer ${PAGO_FACIL_TOKEN}`,
-                },
+        {
+          'cache-control': 'no-cache',
+          'content-type': 'application/json',
+          authorization: `Bearer ${PAGO_FACIL_TOKEN}`,
+        },
       baseUrl: PAGO_FACIL_BASE_URL,
       uri: '',
       timeout: 10000,
@@ -22,7 +22,7 @@ class PagoFacilClient {
     this.loginToken = this.loginToken.bind(this);
   }
 
-  async _send(uri, options, requestSchema) {
+  async send(uri, options, requestSchema) {
     try {
       if (options) {
         this.options.method = options;
@@ -57,10 +57,29 @@ class PagoFacilClient {
     const uri = 'loginToken';
     const options = 'POST';
     const requestSchema = {};
-    const result = await this._send(uri, options, requestSchema);
-    console.log(`Pago Facil JWT token ${result}`);
+    const result = await this.send(uri, options, requestSchema);
+    logger.info(`Pago Facil JWT token ${result}`);
     return result;
   }
+
+
+  async createTrxs(id, amount) {
+    const uri = 'trxs/create';
+    const options = 'POST';
+    const requestSchema = {
+      "x_url_callback" : "http://ec2-52-67-244-183.sa-east-1.compute.amazonaws.com:3000/pay/pagofacil/callback?token=VERIFICATION_TOKEN",
+      "x_url_cancel":"http://ec2-52-67-244-183.sa-east-1.compute.amazonaws.com:3000/pay/pagofacil/cancel?token=VERIFICATION_TOKEN",
+      "x_url_complete":"http://ec2-52-67-244-183.sa-east-1.compute.amazonaws.com:3000/pay/pagofacil/complete?token=VERIFICATION_TOKEN",
+      "x_customer_email":PAGO_FACIL_USER,
+      "x_reference":id,
+      "x_account_id":PAGO_FACIL_ACCOUNT_ID,
+      "x_amount": amount
+    };
+    const result = await this.send(uri, options, requestSchema);
+    logger.info(`Pago Facil JWT token ${result}`);
+    return result;
+  }
+
 }
 
 module.exports = PagoFacilClient;

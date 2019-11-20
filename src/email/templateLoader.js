@@ -6,7 +6,7 @@ const { PUBLIC_WEB_SITE } = require('../config');
 
 async function compileTemplates() {
   const templateFilepaths = await bluebird.promisify(fs.readdir)(path.join(__dirname, 'templates/')).then(
-    (templateFilepaths) => templateFilepaths.filter(
+    (data) => data.filter(
       (templateFilepath) => !!/^(.*).html$/.exec(templateFilepath),
     ),
   );

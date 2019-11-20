@@ -1,5 +1,4 @@
 const nodemailer = require('nodemailer');
-const fs = require('fs');
 const pdf = require('html-pdf');
 const {
   EMAIL_ACCOUNT, EMAIL_SECRET, EMAIL_FROM_ADDR, TEMPLATE_PATH,
@@ -25,12 +24,12 @@ module.exports = {
   ).then(
     (content) =>
 
-    /*
-                pdf.create(content, options).toFile(TEMPLATE_PATH +'resguardo.pdf',
-                    function (err, res) {
-                        if (err) return console.log(err);
-                        console.log("se creo pdf"); //
-*/
+      /*
+                  pdf.create(content, options).toFile(TEMPLATE_PATH +'resguardo.pdf',
+                      function (err, res) {
+                          if (err) return console.log(err);
+                          console.log("se creo pdf"); //
+  */
       new Promise(
         (resolve, reject) => {
           transporter.sendMail(
@@ -61,6 +60,5 @@ module.exports = {
     /*
             });
       */
-
   ),
 };

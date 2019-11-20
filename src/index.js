@@ -1,13 +1,11 @@
-
 const express = require('express');
 const bodyParser = require('body-parser');
 
 const app = express().use(bodyParser.json()); // creates http server
 const schedule = require('node-schedule');
-const { TOKEN } = require('./config');
-const { EMAIL_ACCOUNT, EMAIL_SECRET, EMAIL_FROM_ADDR } = require('./config');
-const { sendTemplate } = require('./email/sendMail');
-const { callPagoFacil } = require('./pagoFacil/index');
+const {TOKEN} = require('./config');
+const {EMAIL_FROM_ADDR} = require('./config');
+const {sendTemplate} = require('./email/sendMail');
 const MonaxClient = require('./monax/MonaxClient');
 const StorageClient = require('./storage/StorageClient');
 const Status = require('./storage/Status');
@@ -22,20 +20,20 @@ const CODE_NO_ERROR = 'OK';
 const MSG_RECEIVED = 'Message received successfully';
 
 
-const processMessageReceived = schedule.scheduleJob('*/60 * * * * *', async () => {
+schedule.scheduleJob('*/60 * * * * *', async () => {
   logger.info('========================START job run each 60 seconds PROCESS RECEIVED MSG============================');
-  const p = await payment.processReceived();
+  await payment.processReceived();
   logger.info('========================FINISH job run each 60 seconds================================================');
 });
 
-const processMessageFinish = schedule.scheduleJob('*/120 * * * * *', async () => {
+schedule.scheduleJob('*/120 * * * * *', async () => {
   logger.info('========================START job run each 120 seconds PROCESS FINISH MSG===============================');
-  const p = payment.processFinish();
+  payment.processFinish();
   logger.info('========================FINISH job run each 120 seconds=================================================');
 });
 
 
-app.listen(3000, () => console.log('Webhook is listening'));
+app.listen(3000, () => logger.info('Webhook is listening'));
 
 
 /** **************************************
@@ -62,7 +60,7 @@ app.post('/pay', async (req, res) => {
   }
   logger.info(`2 Request OK ${req.query.token}`);
   logger.info('3 Pay data: ', req.body);
-  const { body } = req;
+  const {body} = req;
   const id = req.body.activity_instance_id;
 
 
@@ -89,20 +87,16 @@ app.post('/pay', async (req, res) => {
  * GET payment received
  ************************************** */
 app.get('/pay', (req, res) => {
-  // logger.info("1");
-  const { token } = req.query;
+  const {token} = req.query;
   const id = req.query.activity_instance_id;
-  // logger.info("2");
 
   if (token !== TOKEN) {
     logger.error(`Token Invalid ${req.query.token}`);
     return res.sendStatus(401);
   }
-  // logger.info("3");
 
   let response = {};
   if (id) {
-    // logger.info("activity_instance_id = ", req.query.activity_instance_id)
     response = storageClient.get(id);//
   }
   const data = {
@@ -112,7 +106,7 @@ app.get('/pay', (req, res) => {
     },
   };
 
-  res.json(data);
+  return res.json(data);
 });
 
 /** **************************************************
@@ -120,7 +114,7 @@ app.get('/pay', (req, res) => {
  * use this endpoint to retry to complete the task
  *************************************************** */
 app.put('/pay/task/complete', (req, res) => {
-  const { token } = req.query;
+  const {token} = req.query;
   const id = req.query.activity_instance_id;
   const result = {};
 
@@ -128,16 +122,12 @@ app.put('/pay/task/complete', (req, res) => {
     logger.error(`Token Invalid ${req.query.token}`);
     return res.sendStatus(401);
   }
-  const response = {};
   if (id) {
-    // logger.info("1 Begin /pay/task/complete - activity_instance_id = ", id)
     monaxClient.getAndCompleteTask(id)
-      .then((msg) => {
-        // logger.info(msg);
+      .then(() => {
         logger.info('2 End /pay/task/complete');
       })
       .catch((e) => console.error(e));
-    // logger.info("3 End /pay/task/complete");
   }
   const data = {
     response: {
@@ -158,8 +148,6 @@ app.post('/resguardo', (req, res) => {
     logger.error(`Token Invalid ${req.query.token}`);
     return res.sendStatus(401);
   }
-  // logger.info("Request /resguardo OK", req.query.token)
-  // logger.info("Resguardo data: ", req.body);
 
 
   sendTemplate(
@@ -171,7 +159,7 @@ app.post('/resguardo', (req, res) => {
       last_name: 'Pereztest',
     },
   ).then(() => console.log('then')).catch((err) => {
-    console.error('err', err);
+    logger.error(`err ${err}`);
   });
 
   const data = {
@@ -217,7 +205,7 @@ app.post('/pay/send', (req, res) => {
  * GET Message by ID
  ************************************** */
 app.get('/message/:activity_instance_id', (req, res) => {
-  const { token } = req.query;
+  const {token} = req.query;
   const id = req.params.activity_instance_id;
   if (token !== TOKEN) {
     logger.error(`Token Invalid ${req.query.token}`);
@@ -235,14 +223,14 @@ app.get('/message/:activity_instance_id', (req, res) => {
       message: response,
     },
   };
-  res.json(data);
+  return res.json(data);
 });
 
 /** **************************************
  * GET Message list  by STATUS
  ************************************** */
 app.get('/message/status/:statusId', (req, res) => {
-  const { token } = req.query;
+  const {token} = req.query;
   const status = req.params.statusId;
   if (token !== TOKEN) {
     logger.error(`Token Invalid ${req.query.token}`);
@@ -259,14 +247,14 @@ app.get('/message/status/:statusId', (req, res) => {
       message: response,
     },
   };
-  res.json(data);
+  return res.json(data);
 });
 
 /** **************************************
  * POST Message Manually
  ************************************** */
 app.post('/message', (req, res) => {
-  const { token } = req.query;
+  const {token} = req.query;
   if (token !== TOKEN) {
     logger.error(`Token Invalid ${req.query.token}`);
     return res.sendStatus(401);
@@ -290,7 +278,7 @@ app.post('/message', (req, res) => {
  * DELETE Message by ID
  ************************************** */
 app.delete('/message/:activity_instance_id', (req, res) => {
-  const { token } = req.query;
+  const {token} = req.query;
   const id = req.params.activity_instance_id;
   if (token !== TOKEN) {
     logger.error(`Token Invalid ${req.query.token}`);
@@ -308,7 +296,7 @@ app.delete('/message/:activity_instance_id', (req, res) => {
       message: response,
     },
   };
-  res.json(data);
+  return res.json(data);
 });
 
 
@@ -317,11 +305,11 @@ app.delete('/message/:activity_instance_id', (req, res) => {
  *********************************************************************************************** */
 
 /** **************************************
- * GET /pay/pagofacil/callback
+ * POST /pay/pagofacil/callback
  ************************************** */
-app.get('/pay/pagofacil/callback', (req, res) => {
+app.post('/pay/pagofacil/callback', (req, res) => {
   logger.info('/pay/pagofacil/callback received');
-  const { token } = req.query;
+  const {token} = req.query;
   if (token !== TOKEN) {
     logger.error(`Token Invalid ${req.query.token}`);
     return res.sendStatus(401);
@@ -344,7 +332,7 @@ app.get('/pay/pagofacil/callback', (req, res) => {
  ************************************** */
 app.get('/pay/pagofacil/cancel', (req, res) => {
   logger.info('/pay/pagofacil/cancel received');
-  const { token } = req.query;
+  const {token} = req.query;
   if (token !== TOKEN) {
     logger.error(`Token Invalid ${req.query.token}`);
     return res.sendStatus(401);
@@ -363,11 +351,11 @@ app.get('/pay/pagofacil/cancel', (req, res) => {
 });
 
 /** **************************************
- * GET  /pay/pagofacil/complete
+ * POST  /pay/pagofacil/complete
  ************************************** */
-app.get('/pay/pagofacil/complete', (req, res) => {
+app.post('/pay/pagofacil/complete', (req, res) => {
   logger.info('/pay/pagofacil/complete received');
-  const { token } = req.query;
+  const {token} = req.query;
   if (token !== TOKEN) {
     logger.error(`Token Invalid ${req.query.token}`);
     return res.sendStatus(401);
@@ -391,7 +379,7 @@ app.get('/pay/pagofacil/complete', (req, res) => {
  ************************************** */
 app.get('/pay/pagofacil/tef/callback', (req, res) => {
   logger.info('/pay/pagofacil/tef/callback received');
-  const { token } = req.query;
+  const {token} = req.query;
   if (token !== TOKEN) {
     logger.error(`Token Invalid ${req.query.token}`);
     return res.sendStatus(401);

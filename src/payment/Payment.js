@@ -20,10 +20,14 @@ class Payment {
     logger.info(`List count=${arr.length}`);
 
     if (arr.length > 0) {
-      const p = await this.pagoFacilClient.loginToken().then(() => {
+      await this.pagoFacilClient.loginToken().then(() => {
         arr.forEach((data) => {
           logger.info(`DATA= ${JSON.stringify(data.msg)}`);
+
+          this.pagoFacilClient.
           storageClient.set(data.msg.activity_instance_id, Status.FINISH, data.msg);
+
+
           // TODO process each message
         });
       });
@@ -39,11 +43,11 @@ class Payment {
     logger.info(`List count=${arr.length}`);
 
     if (arr.length > 0) {
-      const s = await this.monaxClient.login().then(() => {
+      await this.monaxClient.login().then(() => {
         arr.forEach((data) => {
           const id = data.msg.activity_instance_id;
           logger.info(`id= ${id}`);
-          const p = this.monaxClient.getAndCompleteTask(id).then(() => {
+          this.monaxClient.getAndCompleteTask(id).then(() => {
             logger.info(`fater call activity_instance_id= ${id}`);
           }).catch((e) => {
             logger.error(`Error= ${e}`);

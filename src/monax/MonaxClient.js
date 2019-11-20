@@ -1,19 +1,19 @@
 const rp = require('request-promise-native');
 const _ = require('lodash');
 const {
-  TOKEN, MONAX_TOKEN, MONAX_BASE_URL, MONAX_USER, MONAX_PASS,
+  MONAX_TOKEN, MONAX_BASE_URL, MONAX_USER, MONAX_PASS,
 } = require('./../config');
 const logger = require('../logger');
 
 class MonaxClient {
-  constructor(args) {
+  constructor() {
     this.options = {
       headers:
-                {
-                  'cache-control': 'no-cache',
-                  'content-type': 'application/json',
-                  cookie: MONAX_TOKEN,
-                },
+        {
+          'cache-control': 'no-cache',
+          'content-type': 'application/json',
+          cookie: MONAX_TOKEN,
+        },
       baseUrl: MONAX_BASE_URL,
       uri: '',
       timeout: 10000,
@@ -25,7 +25,7 @@ class MonaxClient {
     this.login = this.login.bind(this);
   }
 
-  async _send(uri, options, requestSchema) {
+  async send(uri, options, requestSchema) {
     try {
       if (options) {
         this.options.method = options;
@@ -66,7 +66,7 @@ class MonaxClient {
       password: MONAX_PASS,
     };
 
-    const result = await this._send(uri, options, requestSchema);
+    const result = await this.send(uri, options, requestSchema);
     return result;
   }
 
@@ -74,7 +74,7 @@ class MonaxClient {
     const uri = `/bpm/activity-instances/${id}/data-mappings/`;
     const requestSchema = {};
     const options = 'GET';
-    const result = await this._send(uri, options, requestSchema);
+    const result = await this.send(uri, options, requestSchema);
     logger.info(`getActivityInstances result= ${result}`);
     return result;
   }
@@ -83,7 +83,7 @@ class MonaxClient {
     const uri = `/tasks/${id}/complete/`;
     const requestSchema = {};
     const options = 'PUT';
-    const result = await this._send(uri, options, requestSchema);
+    const result = await this.send(uri, options, requestSchema);
     logger.info(`completeTask result= ${result}`);
     return result;
   }
@@ -91,7 +91,7 @@ class MonaxClient {
 
   async getAndCompleteTask(id) {
     logger.info('1.0 getAndCompleteTask');
-    const res = await this.getActivityInstances(id);
+    await this.getActivityInstances(id);
     logger.info('1.1 getAndCompleteTask');
     const result = await this.completeTask(id);
     logger.info('1.2 getAndCompleteTask');

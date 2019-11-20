@@ -11,8 +11,8 @@ class StorageClient {
     return this.storageClient.get(keyPath);
   }
 
-  set(keyPath, status, value) {
-    this.storageClient.set(keyPath, status, value);
+  async set(keyPath, status, value) {
+    await this.storageClient.set(keyPath, status, value);
   }
 
   del(keyPath) {

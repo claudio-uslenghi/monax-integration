@@ -11,7 +11,7 @@ class StorageClientImpl {
     return this.store.get(keyPath);
   }
 
-  set(keyPath, status, value) {
+  async set(keyPath, status, value) {
     const msg = { status, msg: value };
     logger.info(`Msg to persist= ${JSON.stringify(msg)}`);
     this.store.set(keyPath, msg);
@@ -24,15 +24,15 @@ class StorageClientImpl {
   getByStatus(status) {
     const result = [];
     const p = JSON.parse(this.store.json());
-    for (const key in p) {
+
+    Object.keys(p).forEach((key) => {
       logger.info(`Has key=${key} ->  with status=${JSON.stringify(p[key].status)}`);
       if (p[key].status === status) {
         result.push(p[key]);
       }
-    }
+    });
     return result;
   }
 }
-
 
 module.exports = StorageClientImpl;
