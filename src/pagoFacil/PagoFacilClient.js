@@ -58,7 +58,7 @@ class PagoFacilClient {
     const options = 'POST';
     const requestSchema = {};
     const result = await this.send(uri, options, requestSchema);
-    logger.info(`Pago Facil JWT token ${result}`);
+    logger.info(`Pago Facil JWT token ${JSON.stringify(result)}`);
     return result;
   }
 

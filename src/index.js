@@ -378,7 +378,7 @@ app.post('/pay/pagofacil/complete', (req, res) => {
  * GET /pay/pagofacil/tef/callback
  ************************************** */
 app.get('/pay/pagofacil/tef/callback', (req, res) => {
-  logger.info('/pay/pagofacil/tef/callback received');
+  logger.info('GET /pay/pagofacil/tef/callback received');
   const {token} = req.query;
   if (token !== TOKEN) {
     logger.error(`Token Invalid ${req.query.token}`);
@@ -386,7 +386,30 @@ app.get('/pay/pagofacil/tef/callback', (req, res) => {
   }
 
   if (req.body) {
-    logger.info(`/pay/pagofacil/tef/callback body  = ${JSON.stringify(req.body)}`);
+    logger.info(`GET /pay/pagofacil/tef/callback body  = ${JSON.stringify(req.body)}`);
+  }
+  const data = {
+    response: {
+      code: CODE_NO_ERROR,
+      message: MSG_RECEIVED,
+    },
+  };
+  return res.json(data);
+});
+
+/** **************************************
+ * POST /pay/pagofacil/tef/callback
+ ************************************** */
+app.post('/pay/pagofacil/tef/callback', (req, res) => {
+  logger.info('POST /pay/pagofacil/tef/callback received');
+  const {token} = req.query;
+  if (token !== TOKEN) {
+    logger.error(`Token Invalid ${req.query.token}`);
+    return res.sendStatus(401);
+  }
+
+  if (req.body) {
+    logger.info(`POST /pay/pagofacil/tef/callback body= ${JSON.stringify(req.body)}`);
   }
   const data = {
     response: {
