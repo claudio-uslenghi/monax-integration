@@ -59,8 +59,8 @@ app.post('/pay', async (req, res) => {
     return res.sendStatus(401);
   }
   logger.info(`2 Request OK ${req.query.token}`);
-  logger.info('3 Pay data: ', req.body);
-  const {body} = req;
+  logger.info('3 Pay data: ', JSON.stringify(req.body));
+  const body = req.body;
   const id = req.body.activity_instance_id;
 
   // Save data in cached
