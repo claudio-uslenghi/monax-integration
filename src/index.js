@@ -20,13 +20,13 @@ const CODE_NO_ERROR = 'OK';
 const MSG_RECEIVED = 'Message received successfully';
 
 
-schedule.scheduleJob('*/60 * * * * *', async () => {
+schedule.scheduleJob('*/1 * * * *', async () => {
   logger.info('========================START job run each 60 seconds PROCESS RECEIVED MSG============================');
   await payment.processReceived();
   logger.info('========================FINISH job run each 60 seconds================================================');
 });
 
-schedule.scheduleJob('*/120 * * * * *', async () => {
+schedule.scheduleJob('*/2 * * * *', async () => {
   logger.info('========================START job run each 120 seconds PROCESS FINISH MSG===============================');
   payment.processFinish();
   logger.info('========================FINISH job run each 120 seconds=================================================');
@@ -63,10 +63,9 @@ app.post('/pay', async (req, res) => {
   const {body} = req;
   const id = req.body.activity_instance_id;
 
-
   // Save data in cached
   if (id && body) {
-    logger.info(`4 Save data in cache wit id: ${id}`);
+    logger.info(`4 Save data in cache with id: ${id}`);
     storageClient.set(id, Status.RECEIVE, body);//
   } else {
     logger.error(`id or body empty id=${id} body=${body}`);
@@ -375,29 +374,6 @@ app.post('/pay/pagofacil/complete', (req, res) => {
 
 
 /** **************************************
- * GET /pay/pagofacil/tef/callback
- ************************************** */
-app.get('/pay/pagofacil/tef/callback', (req, res) => {
-  logger.info('GET /pay/pagofacil/tef/callback received');
-  const {token} = req.query;
-  if (token !== TOKEN) {
-    logger.error(`Token Invalid ${req.query.token}`);
-    return res.sendStatus(401);
-  }
-
-  if (req.body) {
-    logger.info(`GET /pay/pagofacil/tef/callback body  = ${JSON.stringify(req.body)}`);
-  }
-  const data = {
-    response: {
-      code: CODE_NO_ERROR,
-      message: MSG_RECEIVED,
-    },
-  };
-  return res.json(data);
-});
-
-/** **************************************
  * POST /pay/pagofacil/tef/callback
  ************************************** */
 app.post('/pay/pagofacil/tef/callback', (req, res) => {
@@ -409,8 +385,20 @@ app.post('/pay/pagofacil/tef/callback', (req, res) => {
   }
 
   if (req.body) {
-    logger.info(`POST /pay/pagofacil/tef/callback body= ${JSON.stringify(req.body)}`);
+    logger.info(`POST /pay/pagofacil/tef/callback body  = ${JSON.stringify(req.body)}`);
+
+    const {status} = req.body.tefResponse;
+    const {id} = req.body.tefResponse.tef;
+
+    logger.info(`id ${id} status ${status}`);
+
+    const msg2Update = storageClient.get(id);
+    logger.info(`MSG ${JSON.stringify(msg2Update)}`);
+    storageClient.set(id, Status.FINISH, msg2Update.msg);
+
   }
+
+
   const data = {
     response: {
       code: CODE_NO_ERROR,

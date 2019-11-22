@@ -3,43 +3,63 @@ const Status = require('../storage/Status');
 const PagoFacilClient = require('../pagoFacil/PagoFacilClient');
 const MonaxClient = require('../monax/MonaxClient');
 
-const storageClient = new StorageClient();
 const logger = require('../logger');
 
 class Payment {
   constructor() {
     this.pagoFacilClient = new PagoFacilClient();
     this.monaxClient = new MonaxClient();
+    this.storageClient = new StorageClient();
+
+  }
+
+  async executePagoFacil(id, amount, createToken) {
+    logger.info('1.0 createTrxs');
+    const result1 = await this.pagoFacilClient.createTrxs(id, amount, createToken);
+    logger.info('1.1 tefLoginToken');
+    const tefToken = await this.pagoFacilClient.tefLoginToken();
+    logger.info('1.2 tefTx');
+    const result2 = await this.pagoFacilClient.tefTx(id, amount, tefToken);
+    return result2;
   }
 
   async processReceived() {
     logger.info('Start to process messages received');
 
-    // get DATA
-    const arr = storageClient.getByStatus(Status.RECEIVE);
-    logger.info(`List count=${arr.length}`);
+    try {
+      const arr = this.storageClient.getByStatus(Status.RECEIVE);
+      logger.info(`List count=${arr.length}`);
 
-    if (arr.length > 0) {
-      await this.pagoFacilClient.loginToken().then(() => {
-        arr.forEach((data) => {
-          logger.info(`DATA= ${JSON.stringify(data.msg)}`);
+      if (arr.length > 0) {
+        logger.info('0.9 loginToken');
+        await this.pagoFacilClient.loginToken().then((createToken) => {
+          arr.forEach((data) => {
 
-          this.pagoFacilClient.
-          storageClient.set(data.msg.activity_instance_id, Status.FINISH, data.msg);
+            logger.info(`DATA= ${JSON.stringify(data.msg)}`);
 
+            this.executePagoFacil(data.msg.activity_instance_id, 5001, createToken).then(() => {
 
-          // TODO process each message
+              logger.info('2.0 storageClient.set');
+
+              this.storageClient.set(data.msg.activity_instance_id, Status.IN_PROGRESS, data.msg);
+
+            });
+
+          });
         });
-      });
-    }
+      }
 
+    } catch (err) {
+      logger.error(`${err}`);
+      //throw new Error(err);
+    }
     logger.info('End process messages received');
   }
 
 
   async processFinish() {
     logger.info(`Start to process messages with status ${Status.FINISH}`);
-    const arr = storageClient.getByStatus(Status.FINISH);
+    const arr = this.storageClient.getByStatus(Status.FINISH);
     logger.info(`List count=${arr.length}`);
 
     if (arr.length > 0) {
@@ -57,6 +77,7 @@ class Payment {
     }
     logger.info(`End process messages with status ${Status.FINISH}`);
   }
+
 }
 
 module.exports = Payment;
