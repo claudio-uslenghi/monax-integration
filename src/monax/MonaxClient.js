@@ -42,7 +42,7 @@ class MonaxClient {
       if (message.statusCode !== 200) {
         throw new Error('Did not receive a 200 status code from Monax');
       } else if (_.has(message.body, 'error') && message.body.error !== null) {
-          throw new Error(`Application error returned from Monax. Error: ${JSON.stringify(message.body)}`);
+        throw new Error(`Application error returned from Monax. Error: ${JSON.stringify(message.body)}`);
       } else {
         result = message.body;
       }

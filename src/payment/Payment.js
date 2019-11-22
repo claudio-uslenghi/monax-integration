@@ -10,7 +10,6 @@ class Payment {
     this.pagoFacilClient = new PagoFacilClient();
     this.monaxClient = new MonaxClient();
     this.storageClient = new StorageClient();
-
   }
 
   async executePagoFacil(id, amount, createToken) {
@@ -34,24 +33,20 @@ class Payment {
         logger.info('0.9 loginToken');
         await this.pagoFacilClient.loginToken().then((createToken) => {
           arr.forEach((data) => {
-
             logger.info(`DATA= ${JSON.stringify(data.msg)}`);
 
+            // TODO obtain amounts
             this.executePagoFacil(data.msg.activity_instance_id, 5001, createToken).then(() => {
-
               logger.info('2.0 storageClient.set');
 
               this.storageClient.set(data.msg.activity_instance_id, Status.IN_PROGRESS, data.msg);
-
             });
-
           });
         });
       }
-
     } catch (err) {
       logger.error(`${err}`);
-      //throw new Error(err);
+      // throw new Error(err);
     }
     logger.info('End process messages received');
   }
@@ -77,7 +72,6 @@ class Payment {
     }
     logger.info(`End process messages with status ${Status.FINISH}`);
   }
-
 }
 
 module.exports = Payment;
