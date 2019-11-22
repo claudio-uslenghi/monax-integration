@@ -61,13 +61,17 @@ app.post('/pay', (req, res) => {
   logger.info(`2 Request OK ${req.query.token}`);
   logger.info(`3 Pay data: ${JSON.stringify(req.body)}`);
 
-  const {body} = req;
-  const id = req.body.activity_instance_id;
+  const body = req.body.activityDetails;
+  const id = req.body.activityDetails.activity_instance_id;
 
   // Save data in cached
   if (id && body) {
-    logger.info(`4 Save data in cache with id: ${id}`);
-    storageClient.set(id, Status.RECEIVE, body);//
+    if (storageClient.get(id)) {
+      logger.error(`The message with id=${id} already exists.`);
+    } else {
+      logger.info(`4 Save data in cache with id: ${id}`);
+      storageClient.set(id, Status.RECEIVE, body);
+    }
   } else {
     logger.error(`id or body empty id=${id} body=${body}`);
     return res.sendStatus(401);
@@ -97,7 +101,7 @@ app.get('/pay', (req, res) => {
 
   let response = {};
   if (id) {
-    response = storageClient.get(id);//
+    response = storageClient.get(id);
   }
   const data = {
     response: {
