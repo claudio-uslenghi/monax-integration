@@ -4,4 +4,4 @@ logs/
 storage/
 error.log
 server.log
-.log
+*.log
